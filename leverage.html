@@ -2,32 +2,27 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>ZEUS Laser Configuration Tool</title>
+    <title>ZEUS 配置器</title>
     <style>
-        /* 基礎佈局樣式 */
-        body { margin: 0; background: #0d1117; color: #fff; font-family: sans-serif; height: 100vh; display: flex; flex-direction: column; }
+        /* 嚴謹的 CSS 結構，必須放在 <style> 標籤內 */
+        body { margin: 0; background: #0d1117; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; }
         .zeus-container { display: flex; flex-direction: column; height: 100%; }
         .zeus-header { height: 60px; background: #21262d; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #30363d; }
-        .zeus-workspace { display: flex; flex: 1; overflow: hidden; padding: 20px; gap: 20px; }
+        .zeus-workspace { display: flex; flex: 1; padding: 20px; gap: 20px; overflow: hidden; }
         
-        /* 左側固定面板 (強制不被擠壓) */
+        /* 固定左側面板寬度 */
         .sidebar { width: 300px; flex-shrink: 0; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
-        .panel-box { background: #161b22; padding: 15px; border-radius: 8px; border: 1px solid #30363d; }
-        input { width: 100%; box-sizing: border-box; background: #0d1117; border: 1px solid #30363d; color: #fff; padding: 6px; margin: 5px 0; }
-        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
-
-        /* 右側畫布區域 */
-        .canvas-area { flex-grow: 1; background: #fff; color: #000; padding: 20px; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
+        .canvas-main { flex-grow: 1; display: flex; flex-direction: column; background: #fff; border-radius: 8px; padding: 20px; color: #000; }
+        
+        .panel-box { background: #161b22; padding: 15px; border-radius: 8px; border: 1px solid #30363d; color: #fff; }
+        input { width: 100%; box-sizing: border-box; background: #0d1117; border: 1px solid #30363d; color: #fff; padding: 6px; margin: 4px 0; }
+        
         .grid-canvas { border: 2px solid #000; flex: 1; position: relative; background-size: 20px 20px; background-image: linear-gradient(#eee 1px, transparent 1px), linear-gradient(90deg, #eee 1px, transparent 1px); }
         .factory-field { position: absolute; border: 2px dashed #ff7a00; }
         
         /* 物件樣式 */
-        .box-device { position: absolute; cursor: move; border: 1px solid #000; display: flex; align-items: center; justify-content: center; }
-        .delete-btn { position: absolute; top: -10px; right: -10px; background: red; color: white; border-radius: 50%; border: none; width: 20px; height: 20px; cursor: pointer; }
-        
-        /* 外接尺寸線 (專業工程風格) */
-        .dim-h { position: absolute; bottom: -20px; width: 100%; text-align: center; font-size: 10px; border-top: 1px solid #000; }
-        .dim-v { position: absolute; right: -40px; top: 0; height: 100%; border-left: 1px solid #000; display: flex; align-items: center; padding-left: 5px; font-size: 10px; writing-mode: vertical-rl; }
+        .box-device { position: absolute; cursor: move; border: 1px solid #000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 10px; }
+        .delete-btn { position: absolute; top: -8px; right: -8px; background: red; color: white; border-radius: 50%; border: none; width: 16px; height: 16px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -35,27 +30,26 @@
     <div class="zeus-container">
         <header class="zeus-header">
             <h2>⚡ ZEUS 宙斯雷射配置器</h2>
-            <button id="downloadBtn" style="background:#ff7a00; border:none; padding:10px; color:white; cursor:pointer;">💾 下載圖紙</button>
+            <button id="downloadBtn" style="background:#ff7a00; color:#fff; border:none; padding:8px 15px; cursor:pointer;">💾 下載圖紙</button>
         </header>
 
         <main class="zeus-workspace">
             <aside class="sidebar">
                 <div class="panel-box">
                     <h3>📝 專案與廠房</h3>
-                    <label>機型名稱：</label>
-                    <input type="text" id="modelName" value="ZLF6015">
-                    <div class="input-grid">
-                        <div><label>總長(mm):</label><input type="number" id="fLength" value="12000"></div>
-                        <div><label>總寬(mm):</label><input type="number" id="fWidth" value="5000"></div>
+                    <label>機型名稱：</label><input type="text" id="globalModelName" value="ZLF6015">
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+                        <div><label>廠房長:</label><input type="number" id="factoryLength" value="12000"></div>
+                        <div><label>廠房寬:</label><input type="number" id="factoryWidth" value="5000"></div>
                     </div>
                 </div>
                 <div class="panel-box" id="editPanel">
                     <h3>✏️ 編輯選定物件</h3>
-                    <div id="editFields" style="display:none; display:flex; flex-direction:column; gap:5px;">
-                        <input type="text" id="editName">
-                        <div class="input-grid">
-                            <input type="number" id="editLength">
-                            <input type="number" id="editWidth">
+                    <div id="editFields" style="display:flex; flex-direction:column; gap:5px;">
+                        <label>名稱:</label><input type="text" id="editName">
+                        <div class="input-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+                            <input type="number" id="editLength" placeholder="長">
+                            <input type="number" id="editWidth" placeholder="寬">
                         </div>
                         <input type="color" id="editColor">
                     </div>
@@ -63,8 +57,8 @@
                 <button id="addBtn" style="padding:10px; cursor:pointer;">⚡ 新增障礙物</button>
             </aside>
 
-            <section class="canvas-area">
-                <h2 id="displayTitle">ZLF6015 佈局圖</h2>
+            <section class="canvas-main">
+                <h2 id="headerModelName">ZLF6015 佈局圖</h2>
                 <div id="layoutCanvas" class="grid-canvas">
                     <div id="scalableField" class="factory-field"></div>
                 </div>
@@ -72,10 +66,9 @@
         </main>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
         let data = { 'main': { name: 'ZLF6015 主機', w: 8181, h: 2409, color: '#334155', x: 50, y: 50 } };
-        let selectedId = null;
+        let selectedId = 'main';
 
         function render() {
             const field = document.getElementById('scalableField');
@@ -84,21 +77,14 @@
                 const d = data[id];
                 const el = document.createElement('div');
                 el.className = 'box-device';
-                el.style.left = d.x + 'px';
-                el.style.top = d.y + 'px';
-                el.style.width = (d.w * 0.05) + 'px';
+                el.style.left = d.x + 'px'; el.style.top = d.y + 'px';
+                el.style.width = (d.w * 0.05) + 'px'; 
                 el.style.height = (d.h * 0.05) + 'px';
                 el.style.backgroundColor = d.color;
-                el.innerHTML = `
-                    <button class="delete-btn">×</button>
-                    <div style="color:#fff; font-size:10px;">${d.name}</div>
-                    <div class="dim-h">${d.w}mm</div>
-                    <div class="dim-v">${d.h}mm</div>
-                `;
+                el.innerHTML = `<button class="delete-btn">×</button><div>${d.name}</div>`;
+                
                 el.onclick = (e) => { 
-                    e.stopPropagation();
-                    selectedId = id;
-                    document.getElementById('editFields').style.display = 'flex';
+                    e.stopPropagation(); selectedId = id;
                     document.getElementById('editName').value = d.name;
                     document.getElementById('editLength').value = d.w;
                     document.getElementById('editWidth').value = d.h;
@@ -109,20 +95,14 @@
             }
         }
 
-        // 綁定編輯連動
         document.getElementById('editName').oninput = (e) => { data[selectedId].name = e.target.value; render(); };
         document.getElementById('editLength').oninput = (e) => { data[selectedId].w = e.target.value; render(); };
         document.getElementById('editWidth').oninput = (e) => { data[selectedId].h = e.target.value; render(); };
         document.getElementById('editColor').oninput = (e) => { data[selectedId].color = e.target.value; render(); };
-        document.getElementById('modelName').oninput = (e) => { 
-            document.getElementById('displayTitle').innerText = e.target.value + ' 佈局圖'; 
+        
+        document.getElementById('globalModelName').oninput = (e) => {
+            document.getElementById('headerModelName').innerText = e.target.value + ' 佈局圖';
             data['main'].name = e.target.value + ' 主機';
-            render();
-        };
-
-        document.getElementById('addBtn').onclick = () => {
-            const id = 'obj_' + Date.now();
-            data[id] = { name: '新設備', w: 1000, h: 1000, color: '#4b5563', x: 100, y: 100 };
             render();
         };
 
