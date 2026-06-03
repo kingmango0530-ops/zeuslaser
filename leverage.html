@@ -3,179 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZEUS 宙斯雷射 - 2D/3D 設備配置模擬器</title>
-    
+    <title>ZEUS Laser - Configuration Tool</title>
     <link rel="stylesheet" href="style.css">
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
     <div class="zeus-container">
-        
         <div class="zeus-header">
             <div>
                 <h1 class="brand-title">⚡ ZEUS 宙斯雷射</h1>
-                <p class="brand-subtitle">通用型 2D/3D 設備配置模擬器（GitHub 部署版）</p>
+                <p class="brand-subtitle">專業版 - 2D/3D 聯動機台配置器</p>
             </div>
-            <button id="downloadBtn" class="zeus-btn">💾 下載 2D 配置圖</button>
+            <button id="downloadBtn" class="zeus-btn">💾 下載 2D 工程圖</button>
         </div>
 
         <div class="zeus-workspace">
-            
             <div class="sidebar">
-                
                 <div class="panel-box">
-                    <h3 class="panel-h3" style="color: #58a6ff;">📝 1. 圖紙基本資訊設定</h3>
+                    <h3 class="panel-h3">📝 專案基本設定</h3>
                     <div class="input-stack">
-                        <div class="input-item">
-                            <label>本案雷射切割機型號名稱：</label>
-                            <input type="text" id="globalModelName" value="ZLF6015">
-                        </div>
+                        <label>機型名稱：</label>
+                        <input type="text" id="globalModelName" value="ZLF6015">
+                        <label>廠房總長 (L) mm：</label>
+                        <input type="number" id="factoryLength" value="12000">
+                        <label>廠房總寬 (W) mm：</label>
+                        <input type="number" id="factoryWidth" value="5000">
                     </div>
                 </div>
 
-                <div class="panel-box">
-                    <h3 class="panel-h3">📐 2. 廠房空間設定 (毫米)</h3>
-                    <div class="input-stack">
-                        <div class="input-item">
-                            <label>預估可用總長度 (L)：</label>
-                            <input type="number" id="factoryLength" value="12000">
-                        </div>
-                        <div class="input-item">
-                            <label>預估可用總寬度 (W)：</label>
-                            <input type="number" id="factoryWidth" value="5000">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="panel-box edit-panel" id="editPanel">
-                    <h3 class="panel-h3" style="color: #ff7a00;">✏️ 3. 編修畫布選定物件</h3>
-                    <p id="noSelectPrompt" style="font-size: 12px; color: #8b949e; margin: 0;">※ 請點擊右側畫布中的物件，即可直接在下方修改其長寬、高度或自選變色。</p>
+                <div class="panel-box" id="editPanel">
+                    <h3 class="panel-h3">✏️ 編輯選定物件</h3>
+                    <p id="noSelectPrompt" style="font-size: 12px; color: #888;">※ 點擊畫布物件進行二次編輯</p>
                     <div id="editFields" class="input-stack" style="display: none;">
-                        <div class="input-item">
-                            <label>物件/機台名稱：</label>
-                            <input type="text" id="editName">
-                        </div>
+                        <label>物件名稱：</label> <input type="text" id="editName">
                         <div class="input-grid">
-                            <div class="input-item">
-                                <label>長 (L) mm：</label>
-                                <input type="number" id="editLength">
-                            </div>
-                            <div class="input-item">
-                                <label>寬 (W) mm：</label>
-                                <input type="number" id="editWidth">
-                            </div>
+                            <div><label>長(L):</label> <input type="number" id="editLength"></div>
+                            <div><label>寬(W):</label> <input type="number" id="editWidth"></div>
                         </div>
-                        <div class="input-grid">
-                            <div class="input-item">
-                                <label>3D 機體高度 mm：</label>
-                                <input type="number" id="editHeight">
-                            </div>
-                            <div class="input-item">
-                                <label>物件顏色：</label>
-                                <input type="color" id="editColor" class="color-picker-input">
-                            </div>
-                        </div>
+                        <label>機體高度 (H):</label> <input type="number" id="editHeight">
+                        <label>機台顏色：</label> <input type="color" id="editColor" style="height:30px;">
                     </div>
                 </div>
 
                 <div class="panel-box">
-                    <h3 class="panel-h3">➕ 4. 新增其他設備/廠房障礙物</h3>
+                    <h3 class="panel-h3">➕ 新增設備</h3>
                     <div class="input-stack">
-                        <div class="input-item">
-                            <label>物件名稱：</label>
-                            <input type="text" id="newName" value="輔助機台/水泥柱">
-                        </div>
+                        <input type="text" id="newName" value="輔助設備">
                         <div class="input-grid">
-                            <div class="input-item">
-                                <label>長 (L) mm：</label>
-                                <input type="number" id="newLength" value="1500">
-                            </div>
-                            <div class="input-item">
-                                <label>寬 (W) mm：</label>
-                                <input type="number" id="newWidth" value="1500">
-                            </div>
+                            <input type="number" id="newLength" value="1000">
+                            <input type="number" id="newWidth" value="1000">
                         </div>
-                        <div class="input-item">
-                            <label>預設機體高度 mm：</label>
-                            <input type="number" id="newHeight" value="1200">
-                        </div>
-                        <div class="input-item">
-                            <label>物件顏色：</label>
-                            <input type="color" id="newColor" value="#475569" class="color-picker-input">
-                        </div>
-                        <button id="addObjBtn" class="zeus-btn-secondary" style="width:100%;">⚡ 放入畫布</button>
+                        <button id="addObjBtn" class="zeus-btn-secondary">⚡ 新增物件</button>
                     </div>
                 </div>
-
             </div>
 
             <div class="canvas-main-area">
-                
-                <div class="section-title">🛑 2D 平面佈局規劃（滑鼠直接拖曳擺放，選取可修改尺寸與名字）</div>
                 <div id="captureArea" class="capture-zone">
                     <div class="canvas-header">
-                        <div>
-                            <h2 class="canvas-title">ZEUS 宙斯雷射設備佈置模擬圖</h2>
-                            <p class="canvas-subtitle">機型：<span id="headerModelName" style="font-weight: bold; color: #111827;">ZLF6015</span> 大型纖維雷射切割機系統</p>
-                        </div>
-                        <div class="canvas-meta">
-                            <p>平面空間：<span id="canvasSpec" class="meta-bold">12000 x 5000 mm</span></p>
-                        </div>
+                        <h2><span id="headerModelName">ZLF6015</span> 配置模擬</h2>
+                        <p>空間: <span id="canvasSpec">12000 x 5000 mm</span></p>
                     </div>
-
                     <div id="layoutCanvas" class="grid-canvas">
                         <div id="scalableField" class="factory-field">
-                            
-                            <div class="box-device main-box" data-id="main" style="top: 20px; left: 20px; background-color: #334155;">
+                            <div class="box-device" data-id="main" style="top:50px; left:50px; background-color:#334155;">
                                 <button class="delete-icon-btn">×</button>
                                 <div class="device-inner-name">ZLF6015 主機</div>
                                 <div class="dim-line dim-h"><span class="dim-text">8181 mm</span></div>
                                 <div class="dim-line dim-v"><span class="dim-text">2409 mm</span></div>
                             </div>
-
-                            <div class="box-device" data-id="chiller" style="top: 280px; left: 20px; background-color: #0284c7;">
-                                <button class="delete-icon-btn">×</button>
-                                <div class="device-inner-name">冷水機</div>
-                                <div class="dim-line dim-h"><span class="dim-text">900 mm</span></div>
-                                <div class="dim-line dim-v"><span class="dim-text">900 mm</span></div>
-                            </div>
-
-                            <div class="box-device" data-id="laser" style="top: 280px; left: 150px; background-color: #0d9488;">
-                                <button class="delete-icon-btn">×</button>
-                                <div class="device-inner-name">激光器</div>
-                                <div class="dim-line dim-h"><span class="dim-text">900 mm</span></div>
-                                <div class="dim-line dim-v"><span class="dim-text">520 mm</span></div>
-                            </div>
-
-                            <div class="box-device" data-id="transformer" style="top: 280px; left: 280px; background-color: #b45309;">
-                                <button class="delete-icon-btn">×</button>
-                                <div class="device-inner-name">變壓器</div>
-                                <div class="dim-line dim-h"><span class="dim-text">520 mm</span></div>
-                                <div class="dim-line dim-v"><span class="dim-text">520 mm</span></div>
-                            </div>
-
-                            <div class="box-device" data-id="control" style="top: 280px; left: 390px; background-color: #4f46e5;">
-                                <button class="delete-icon-btn">×</button>
-                                <div class="device-inner-name">控制櫃</div>
-                                <div class="dim-line dim-h"><span class="dim-text">650 mm</span></div>
-                                <div class="dim-line dim-v"><span class="dim-text">160 mm</span></div>
-                            </div>
-
                         </div>
                     </div>
                 </div>
-
-                <div class="section-title" style="margin-top: 20px;">📦 3D 實時模擬（工業級水泥砂漿牆面與外緣標註尺寸線）</div>
                 <div id="threeContainer" class="three-container-box"></div>
-
             </div>
-
         </div>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
+body { margin: 0; padding: 20px; background: #0d1117; color: #fff; font-family: sans-serif; }
+.zeus-container { max-width: 1300px; margin: 0 auto; background: #161b22; border-radius: 10px; overflow: hidden; }
+.zeus-header { padding: 20px; background: #21262d; display: flex; justify-content: space-between; align-items: center; }
+.zeus-workspace { display: flex; gap: 20px; padding: 20px; }
+.sidebar { width: 300px; flex-shrink: 0; display: flex; flex-direction: column; gap: 15px; }
+.panel-box { background: #0d1117; padding: 15px; border: 1px solid #30363d; border-radius: 8px; }
+.panel-h3 { margin-top: 0; font-size: 14px; color: #ff7a00; }
+.input-stack { display: flex; flex-direction: column; gap: 8px; }
+.input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+input { background: #161b22; border: 1px solid #30363d; color: white; padding: 5px; border-radius: 4px; }
+.zeus-btn { background: #ff7a00; border: none; padding: 10px 20px; color: white; border-radius: 5px; cursor: pointer; }
+.zeus-btn-secondary { background: #21262d; border: 1px solid #30363d; color: white; padding: 8px; cursor: pointer; }
+
+/* 2D Canvas */
+.capture-zone { background: #fff; color: #000; padding: 20px; }
+.grid-canvas { border: 2px solid #000; height: 300px; position: relative; background-image: linear-gradient(#eee 1px, transparent 1px), linear-gradient(90deg, #eee 1px, transparent 1px); background-size: 20px 20px; }
+.factory-field { border: 2px dashed #ff7a00; position: absolute; }
+.box-device { position: absolute; cursor: move; border: 1px solid #000; display: flex; align-items: center; justify-content: center; }
+.device-inner-name { font-size: 10px; font-weight: bold; color: #fff; text-align: center; pointer-events: none; }
+.delete-icon-btn { position: absolute; top: -8px; right: -8px; background: red; color: white; border-radius: 50%; border: none; width: 16px; height: 16px; font-size: 10px; display: none; }
+.box-device:hover .delete-icon-btn { display: block; }
+.hide-delete-ui .delete-icon-btn { display: none !important; }
+
+/* 尺寸線 */
+.dim-line { position: absolute; }
+.dim-h { bottom: -15px; left: 0; width: 100%; border-left: 1px solid black; border-right: 1px solid black; border-bottom: 1px solid black; }
+.dim-v { right: -15px; top: 0; height: 100%; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; }
+.dim-text { font-size: 9px; background: white; padding: 0 2px; }
+
+const deviceData = {
+    'main': { name: 'ZLF6015 主機', w: 8181, h: 2409, depth: 1600, color: '#334155' }
+};
+
+let globalScale = 1;
+let selectedElement = null;
+
+function updateLayout() {
+    const fL = parseFloat(document.getElementById('factoryLength').value) || 12000;
+    const fW = parseFloat(document.getElementById('factoryWidth').value) || 5000;
+    const canvas = document.getElementById('layoutCanvas');
+    const field = document.getElementById('scalableField');
+    
+    globalScale = Math.min((canvas.clientWidth - 60) / fL, (canvas.clientHeight - 60) / fW);
+    field.style.width = (fL * globalScale) + 'px';
+    field.style.height = (fW * globalScale) + 'px';
+
+    document.querySelectorAll('.box-device').forEach(el => {
+        const id = el.dataset.id;
+        if (deviceData[id]) {
+            el.style.width = (deviceData[id].w * globalScale) + 'px';
+            el.style.height = (deviceData[id].h * globalScale) + 'px';
+            el.style.backgroundColor = deviceData[id].color;
+            el.querySelector('.device-inner-name').innerText = deviceData[id].name;
+            el.querySelector('.dim-h .dim-text').innerText = deviceData[id].w + 'mm';
+            el.querySelector('.dim-v .dim-text').innerText = deviceData[id].h + 'mm';
+        }
+    });
+}
+
+function initDevice(el) {
+    el.onmousedown = (e) => {
+        selectedElement = el;
+        document.getElementById('editFields').style.display = 'block';
+        document.getElementById('noSelectPrompt').style.display = 'none';
+        
+        const id = el.dataset.id;
+        document.getElementById('editName').value = deviceData[id].name;
+        document.getElementById('editLength').value = deviceData[id].w;
+        document.getElementById('editWidth').value = deviceData[id].h;
+        document.getElementById('editHeight').value = deviceData[id].depth;
+        document.getElementById('editColor').value = deviceData[id].color;
+    };
+    el.querySelector('.delete-icon-btn').onclick = (e) => { e.stopPropagation(); delete deviceData[el.dataset.id]; el.remove(); };
+}
+
+// 綁定輸入即時更新 (解鎖 Bug 的關鍵)
+['editName', 'editLength', 'editWidth', 'editHeight', 'editColor'].forEach(id => {
+    document.getElementById(id).oninput = (e) => {
+        if (!selectedElement) return;
+        const d = deviceData[selectedElement.dataset.id];
+        if (id === 'editName') d.name = e.target.value;
+        if (id === 'editLength') d.w = parseFloat(e.target.value);
+        if (id === 'editWidth') d.h = parseFloat(e.target.value);
+        if (id === 'editHeight') d.depth = parseFloat(e.target.value);
+        if (id === 'editColor') d.color = e.target.value;
+        updateLayout();
+    };
+});
+
+document.getElementById('globalModelName').oninput = (e) => document.getElementById('headerModelName').innerText = e.target.value;
+document.getElementById('addObjBtn').onclick = () => { /* 新增邏輯 */ };
+document.querySelectorAll('.box-device').forEach(initDevice);
+updateLayout();
+/* 3D Container */
+.three-container-box { width: 100%; height: 400px; background: #000; margin-top: 20px; border-radius: 8px; }
