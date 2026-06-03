@@ -1,1 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZEUS 宙斯雷射 - 2D/3D 設備配置模擬器</title>
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
 
+    <div class="zeus-container">
+        
+        <div class="zeus-header">
+            <div>
+                <h1 class="brand-title">⚡ ZEUS 宙斯雷射</h1>
+                <p class="brand-subtitle">通用型 2D/3D 設備配置模擬器（GitHub 部署版）</p>
+            </div>
+            <button id="downloadBtn" class="zeus-btn">💾 下載 2D 配置圖</button>
+        </div>
+
+        <div class="zeus-workspace">
+            
+            <div class="sidebar">
+                
+                <div class="panel-box">
+                    <h3 class="panel-h3" style="color: #58a6ff;">📝 1. 圖紙基本資訊設定</h3>
+                    <div class="input-stack">
+                        <div class="input-item">
+                            <label>本案雷射切割機型號名稱：</label>
+                            <input type="text" id="globalModelName" value="ZLF6015">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-box">
+                    <h3 class="panel-h3">📐 2. 廠房空間設定 (毫米)</h3>
+                    <div class="input-stack">
+                        <div class="input-item">
+                            <label>預估可用總長度 (L)：</label>
+                            <input type="number" id="factoryLength" value="12000">
+                        </div>
+                        <div class="input-item">
+                            <label>預估可用總寬度 (W)：</label>
+                            <input type="number" id="factoryWidth" value="5000">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-box edit-panel" id="editPanel">
+                    <h3 class="panel-h3" style="color: #ff7a00;">✏️ 3. 編修畫布選定物件</h3>
+                    <p id="noSelectPrompt" style="font-size: 12px; color: #8b949e; margin: 0;">※ 請點擊右側畫布中的物件，即可直接在下方修改其長寬、高度或自選變色。</p>
+                    <div id="editFields" class="input-stack" style="display: none;">
+                        <div class="input-item">
+                            <label>物件/機台名稱：</label>
+                            <input type="text" id="editName">
+                        </div>
+                        <div class="input-grid">
+                            <div class="input-item">
+                                <label>長 (L) mm：</label>
+                                <input type="number" id="editLength">
+                            </div>
+                            <div class="input-item">
+                                <label>寬 (W) mm：</label>
+                                <input type="number" id="editWidth">
+                            </div>
+                        </div>
+                        <div class="input-grid">
+                            <div class="input-item">
+                                <label>3D 機體高度 mm：</label>
+                                <input type="number" id="editHeight">
+                            </div>
+                            <div class="input-item">
+                                <label>物件顏色：</label>
+                                <input type="color" id="editColor" class="color-picker-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-box">
+                    <h3 class="panel-h3">➕ 4. 新增其他設備/廠房障礙物</h3>
+                    <div class="input-stack">
+                        <div class="input-item">
+                            <label>物件名稱：</label>
+                            <input type="text" id="newName" value="輔助機台/水泥柱">
+                        </div>
+                        <div class="input-grid">
+                            <div class="input-item">
+                                <label>長 (L) mm：</label>
+                                <input type="number" id="newLength" value="1500">
+                            </div>
+                            <div class="input-item">
+                                <label>寬 (W) mm：</label>
+                                <input type="number" id="newWidth" value="1500">
+                            </div>
+                        </div>
+                        <div class="input-item">
+                            <label>預設機體高度 mm：</label>
+                            <input type="number" id="newHeight" value="1200">
+                        </div>
+                        <div class="input-item">
+                            <label>物件顏色：</label>
+                            <input type="color" id="newColor" value="#475569" class="color-picker-input">
+                        </div>
+                        <button id="addObjBtn" class="zeus-btn-secondary" style="width:100%;">⚡ 放入畫布</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="canvas-main-area">
+                
+                <div class="section-title">🛑 2D 平面佈局規劃（滑鼠直接拖曳擺放，選取可修改尺寸與名字）</div>
+                <div id="captureArea" class="capture-zone">
+                    <div class="canvas-header">
+                        <div>
+                            <h2 class="canvas-title">ZEUS 宙斯雷射設備佈置模擬圖</h2>
+                            <p class="canvas-subtitle">機型：<span id="headerModelName" style="font-weight: bold; color: #111827;">ZLF6015</span> 大型纖維雷射切割機系統</p>
+                        </div>
+                        <div class="canvas-meta">
+                            <p>平面空間：<span id="canvasSpec" class="meta-bold">12000 x 5000 mm</span></p>
+                        </div>
+                    </div>
+
+                    <div id="layoutCanvas" class="grid-canvas">
+                        <div id="scalableField" class="factory-field">
+                            
+                            <div class="box-device main-box" data-id="main" style="top: 20px; left: 20px; background-color: #334155;">
+                                <button class="delete-icon-btn">×</button>
+                                <div class="device-inner-name">ZLF6015 主機</div>
+                                <div class="dim-line dim-h"><span class="dim-text">8181 mm</span></div>
+                                <div class="dim-line dim-v"><span class="dim-text">2409 mm</span></div>
+                            </div>
+
+                            <div class="box-device" data-id="chiller" style="top: 280px; left: 20px; background-color: #0284c7;">
+                                <button class="delete-icon-btn">×</button>
+                                <div class="device-inner-name">冷水機</div>
+                                <div class="dim-line dim-h"><span class="dim-text">900 mm</span></div>
+                                <div class="dim-line dim-v"><span class="dim-text">900 mm</span></div>
+                            </div>
+
+                            <div class="box-device" data-id="laser" style="top: 280px; left: 150px; background-color: #0d9488;">
+                                <button class="delete-icon-btn">×</button>
+                                <div class="device-inner-name">激光器</div>
+                                <div class="dim-line dim-h"><span class="dim-text">900 mm</span></div>
+                                <div class="dim-line dim-v"><span class="dim-text">520 mm</span></div>
+                            </div>
+
+                            <div class="box-device" data-id="transformer" style="top: 280px; left: 280px; background-color: #b45309;">
+                                <button class="delete-icon-btn">×</button>
+                                <div class="device-inner-name">變壓器</div>
+                                <div class="dim-line dim-h"><span class="dim-text">520 mm</span></div>
+                                <div class="dim-line dim-v"><span class="dim-text">520 mm</span></div>
+                            </div>
+
+                            <div class="box-device" data-id="control" style="top: 280px; left: 390px; background-color: #4f46e5;">
+                                <button class="delete-icon-btn">×</button>
+                                <div class="device-inner-name">控制櫃</div>
+                                <div class="dim-line dim-h"><span class="dim-text">650 mm</span></div>
+                                <div class="dim-line dim-v"><span class="dim-text">160 mm</span></div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title" style="margin-top: 20px;">📦 3D 實時模擬（工業級水泥砂漿牆面與外緣標註尺寸線）</div>
+                <div id="threeContainer" class="three-container-box"></div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
