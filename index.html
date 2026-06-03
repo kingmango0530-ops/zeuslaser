@@ -1,1 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ZEUS 宙斯雷射投資回本試算系統(行動優化版)</title>
+  <style>
+    /* 宙斯雷射 ZEUS 專屬極致黑橘工業美學 */
+    body {
+      background-color: #0A0A0A; 
+      color: #E5E5E5;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, "Noto Sans TC", sans-serif;
+      margin: 0;
+      padding: 10px;
+    }
+    .calculator-container {
+      background-color: #141414; 
+      border: 1px solid #262626;
+      border-radius: 4px;
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 15px;
+      box-sizing: border-box;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8);
+    }
+    .calc-header {
+      text-align: center;
+      border-bottom: 2px solid #FF5500; 
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+    }
+    .brand-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .logo-z {
+      background-color: #FF5500;
+      color: #000;
+      font-size: 20px;
+      font-weight: 900;
+      padding: 2px 8px;
+      border-radius: 2px;
+    }
+    .logo-text {
+      font-size: 20px;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: 1px;
+    }
+    .calc-header h2 { color: #FFFFFF; font-size: 16px; margin: 10px 0 5px 0; }
+    .calc-header p { color: #737373; margin: 0; font-size: 11px; }
+    
+    .panel-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #FFFFFF;
+      border-left: 3px solid #FF5500;
+      padding-left: 8px;
+      margin: 20px 0 15px 0;
+      letter-spacing: 0.5px;
+    }
+    
+    .input-group { background-color: #0D0D0D; padding: 12px; border-radius: 4px; margin-bottom: 15px; border: 1px solid #1F1F1F; }
+    
+    /* 🌟 核心修復：使用 flex-wrap 允許在小螢幕自動換行，防止擠壓爆框 */
+    .label-row { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin-bottom: 10px; 
+      gap: 10px; 
+      flex-wrap: wrap; 
+    }
+    .input-group label { font-size: 13px; color: #A3A3A3; font-weight: bold; min-width: 150px; flex: 1; }
+    
+    /* 🌟 核心修復：在手機窄版下自適應調整寬度 */
+    .num-input {
+      background-color: #1A1A1A;
+      border: 1px solid #FF5500;
+      color: #FF5500;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: right;
+      padding: 6px 12px;
+      border-radius: 4px;
+      width: 160px;
+      max-width: 100%;
+      outline: none;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+    .num-input:focus {
+      background-color: #262626;
+      box-shadow: 0 0 8px rgba(255, 85, 0, 0.4);
+    }
+    
+    .value-display { font-size: 16px; font-weight: bold; color: #FF5500; text-align: right; width: 160px; }
+    
+    .input-group input[type="range"] {
+      -webkit-appearance: none; width: 100%; height: 10px; background: #262626; border-radius: 5px; outline: none; margin: 15px 0 10px 0;
+    }
+    .input-group input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 24px; height: 24px; border-radius: 50%; background: #FF5500; cursor: pointer; box-shadow: 0 0 10px rgba(255, 85, 0, 0.6);
+    }
+    .range-labels { display: flex; justify-content: space-between; font-size: 11px; color: #525252; }
+    .input-group select {
+      width: 100%; padding: 12px; background-color: #0A0A0A; border: 1px solid #404040; color: #FFFFFF; font-size: 14px; border-radius: 4px; outline: none;
+    }
 
+    .recommend-tag {
+      background-color: rgba(255, 85, 0, 0.08); border: 1px solid rgba(255, 85, 0, 0.3); color: #FF5500; text-align: center; padding: 10px; font-size: 13px; font-weight: bold; border-radius: 4px; margin-bottom: 20px;
+    }
+    
+    .main-saving-circle {
+      border: 2px solid #FF5500; background: radial-gradient(circle, rgba(255,85,0,0.1) 0%, rgba(0,0,0,0) 70%); width: 160px; height: 160px; border-radius: 50%; margin: 0 auto 20px auto; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; box-sizing: border-box; padding: 15px;
+    }
+    .circle-label { font-size: 10px; color: #A3A3A3; margin-bottom: 6px; line-height: 1.3; }
+    .circle-value { font-size: 18px; font-weight: 800; color: #FF5500; }
+
+    .data-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+    .data-box { background-color: #0A0A0A; border: 1px solid #262626; border-radius: 4px; padding: 12px; }
+    .box-label { display: block; font-size: 11px; color: #737373; margin-bottom: 4px; }
+    .box-value { font-size: 14px; font-weight: bold; color: #FFFFFF; }
+    .box-valueHighlight { font-size: 14px; font-weight: bold; color: #FF5500; }
+
+    .roi-highlight-box {
+      background: linear-gradient(135deg, #261308 0%, #0d0d0d 100%);
+      border: 1px solid #FF5500; border-radius: 4px; padding: 15px; margin-bottom: 15px; text-align: center;
+    }
+    .roi-title { font-size: 12px; color: #FF944d; font-weight: bold; margin-bottom: 5px; letter-spacing: 0.5px; }
+    .roi-value { font-size: 24px; font-weight: 900; color: #FF5500; text-shadow: 0 0 10px rgba(255, 85, 0, 0.3); }
+
+    /* 100 元金流分配面板 */
+    .cash-split-container {
+      background-color: #0D0D0D; 
+      border: 1px solid #FF5500; 
+      border-radius: 4px; 
+      padding: 12px; 
+      margin-bottom: 15px;
+      box-sizing: border-box;
+    }
+    .split-header { font-size: 13px; font-weight: bold; color: #FFFFFF; margin-bottom: 12px; text-align: center; letter-spacing: 0.5px; }
+    .split-header span { color: #ffcc00; }
+    .split-row-box { display: flex; flex-direction: column; gap: 8px; }
+    .split-item { display: flex; justify-content: space-between; align-items: center; background-color: #141414; padding: 8px 12px; border-radius: 3px; border: 1px solid #1F1F1F; gap: 5px; }
+    .split-name { font-size: 11px; color: #A3A3A3; word-break: break-all; }
+    .split-val-out { font-size: 13px; font-weight: bold; color: #007AFF; flex-shrink: 0; }
+    .split-val-zeus { font-size: 13px; font-weight: bold; color: #FF5500; flex-shrink: 0; }
+    .split-val-pocket { font-size: 13px; font-weight: 800; color: #4ade80; flex-shrink: 0; }
+
+    .data-box-detail { background-color: #050505; border: 1px dashed #404040; border-radius: 4px; padding: 12px; margin-bottom: 15px; box-sizing: border-box; }
+    .detail-title { font-size: 12px; color: #FF5500; font-weight: bold; margin-bottom: 8px; }
+    .detail-row { display: flex; justify-content: space-between; font-size: 12px; color: #a3a3a3; margin-bottom: 6px; }
+    .detail-val { font-weight: 500; color: #fff; }
+
+    /* 📊 能量條區塊與動態文字優化 */
+    .chart-section { background-color: #0A0A0A; border: 1px solid #262626; padding: 12px; border-radius: 4px; margin-bottom: 15px; }
+    
+    /* 🌟 核心修復：防止金額標籤在手機寬度不足時爆開 */
+    .chart-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+    .chart-label-title { font-size: 11px; color: #A3A3A3; }
+    .chart-label-price { font-size: 13px; font-weight: bold; }
+
+    .bar-container { background-color: #262626; height: 14px; border-radius: 3px; width: 100%; overflow: hidden; margin-bottom: 15px; position: relative; }
+    .bar { height: 100%; border-radius: 2px; width: 0%; min-width: 4px; transition: width 0.3s ease-out; }
+    .bar-outsource { background-color: #007AFF; box-shadow: 0 0 8px rgba(0, 122, 255, 0.4); }
+    .bar-zeus { background-color: #FF5500; box-shadow: 0 0 8px rgba(255, 85, 0, 0.4); }
+    
+    .profit-text { font-size: 11px; font-weight: bold; text-align: right; margin: 0; }
+    .marketing-footer { font-size: 12px; color: #A3A3A3; line-height: 1.5; margin-bottom: 20px; }
+    .btn-group { display: flex; flex-direction: column; gap: 10px; }
+    .cta-btn { display: block; text-align: center; padding: 14px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 14px; box-sizing: border-box; border: none; width: 100%; cursor: pointer; }
+    .btn-line { background-color: #06C755; color: #fff; box-shadow: 0 4px 10px rgba(6, 199, 85, 0.3); }
+
+    /* 🌟 行動端響應式微調 */
+    @media (max-width: 400px) {
+      .num-input, .value-display { width: 100%; text-align: left; margin-top: 5px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="calculator-container">
+  <div class="calc-header">
+    <div class="brand-header">
+      <span class="logo-z">Z</span>
+      <span class="logo-text">EUS 宙斯雷射</span>
+    </div>
+    <h2>【自購 vs 代工】投資回本精算系統</h2>
+    <p>廠房實測平均加工能耗（工作中全載 60-70%）</p>
+  </div>
+
+  <!-- 輸入區 -->
+  <div class="panel-title">📊 第一步：請輸入客戶加工現況</div>
+  
+  <div class="input-group">
+    <div class="label-row">
+      <label>目前每月外包代工費用 (NT$)</label>
+      <input type="text" id="input-cost-num" class="num-input" value="150,000" oninput="formatFromKeypress('cost')" onkeypress="return isNumberKey(event)">
+    </div>
+    <input type="range" id="input-cost-range" min="0" max="1000000" step="5000" value="150000" oninput="formatFromRange('cost')">
+    <div class="range-labels"><span>0 元</span><span>100 萬元 (上限)</span></div>
+  </div>
+
+  <div class="input-group">
+    <div class="label-row">
+      <label>常用板材主要厚度 (mm)</label>
+      <span class="value-display" id="thick-txt">6 mm</span>
+    </div>
+    <input type="range" id="input-thick" min="1" max="20" step="1" value="6" oninput="updateUI()">
+    <div class="range-labels"><span>1 mm</span><span>20 mm+</span></div>
+  </div>
+
+  <div class="input-group">
+    <div class="label-row">
+      <label>ZEUS 設備投資總價 (NT$)</label>
+      <input type="text" id="input-price-num" class="num-input" style="color: #ffffff; border-color: #404040;" value="2,800,000" oninput="formatFromKeypress('price')" onkeypress="return isNumberKey(event)">
+    </div>
+    <input type="range" id="input-price-range" min="0" max="15000000" step="50000" value="2800000" oninput="formatFromRange('price')">
+    <div class="range-labels"><span>0 元</span><span>1,500 萬元</span></div>
+  </div>
+
+  <div class="input-group">
+    <label>規劃資融分期貸款期數</label>
+    <select id="input-finance" onchange="updateUI()">
+      <option value="36">36 期 (3年分期)</option>
+      <option value="48" selected>48 期 (4年分期)</option>
+      <option value="60">60 期 (5年分期)</option>
+    </select>
+  </div>
+
+  <div class="input-group">
+    <div class="label-row">
+      <label>規劃融資年利率 (%)</label>
+      <span class="value-display" id="rate-txt">3.5 %</span>
+    </div>
+    <input type="range" id="input-rate" min="1" max="10" step="0.5" value="3.5" oninput="updateUI()">
+    <div class="range-labels"><span>1.0 %</span><span>10.0 %</span></div>
+  </div>
+
+  <div class="input-group">
+    <label>預計主要切割氣體</label>
+    <select id="input-gas" onchange="updateUI()">
+      <option value="air">空氣 (高壓空氣，大幅降低營運開銷)</option>
+      <option value="n2">氮氣 (高壓氮氣，切斷面無氧化層)</option>
+      <option value="o2">氧氣 (低壓氧氣，厚碳鋼主力輔助)</option>
+    </select>
+  </div>
+
+  <!-- 結果區 -->
+  <div class="panel-title">⚡ 第二步：扣除所有成本淨利潤與回本期</div>
+  
+  <div class="recommend-tag" id="rec-power">系統推薦：ZEUS-3015 / 6000W 雷射切割機</div>
+
+  <div class="roi-highlight-box">
+    <div class="roi-title">⌛ 預估設備投資回本週期</div>
+    <div class="roi-value" id="res-roi-time">精算中...</div>
+  </div>
+
+  <!-- 100 元金流分配面板 -->
+  <div class="cash-split-container">
+    <div class="split-header">💡 財務分配：假設原本外包付出 <span>$100 元</span></div>
+    <div class="split-row-box">
+      <div class="split-item">
+        <span class="split-name">🔴 傳統外包代工現狀：</span>
+        <span class="split-val-out">$ 100 元全給代工廠</span>
+      </div>
+      <div class="split-item">
+        <span class="split-name">⚡ 宙斯進場 - 生產氣電能耗佔：</span>
+        <span class="split-val-zeus" id="split-energy">$ 0 元</span>
+      </div>
+      <div class="split-item">
+        <span class="split-name">🏦 宙斯進場 - 設備貸款分期佔：</span>
+        <span class="split-val-zeus" id="split-loan">$ 0 元</span>
+      </div>
+      <div class="split-item" style="background-color: rgba(74,222,128,0.05); border-color: rgba(74,222,128,0.3);">
+        <span class="split-name" style="color: #4ade80; font-weight: bold;">🎉 宙斯進場 - 多留在口袋的錢：</span>
+        <span class="split-val-pocket" id="split-pocket">$ 0 元</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-saving-circle">
+    <div class="circle-label" id="circle-title">扣除貸款後<br>每月淨賺利潤</div>
+    <div class="circle-value" id="res-savings">NT$ 0</div>
+  </div>
+
+  <div class="data-grid">
+    <div class="data-box">
+      <span class="box-label">由目前外包費反推之「每月雷射加工時數」</span>
+      <span class="box-valueHighlight" id="res-hours">100 小時</span>
+    </div>
+    <div class="data-box">
+      <span class="box-label">估算機台分期月付款</span>
+      <span class="box-value" style="color: #ffcc00;" id="res-loan">NT$ 62,500</span>
+    </div>
+    
+    <div class="data-box-detail">
+      <div class="detail-title">🔍 ZEUS 財務與實測耗電精算</div>
+      <div class="detail-row"><span>● 原本外包總開銷：</span><span id="detail-outsource" style="color:#fff;">NT$ 0</span></div>
+      <div class="detail-row"><span>● 實際生產電費 (4.8元/度)：</span><span id="detail-elec" style="color:#ff5500;">- NT$ 0</span></div>
+      <div class="detail-row"><span>● 氣體與耗材費預估：</span><span id="detail-gas" style="color:#ff5500;">- NT$ 0</span></div>
+      <div class="detail-row"><span>● 資融貸款月付款 (含利息)：</span><span id="detail-loan-cost" style="color:#ffcc00;">- NT$ 0</span></div>
+      <div class="detail-row"><span>● 省下物流/司機往返：</span><span id="detail-logistic" style="color:#4ade80;">+ NT$ 8,000</span></div>
+    </div>
+  </div>
+
+  <!-- 📊 能量條區塊 -->
+  <div class="chart-section">
+    <div class="chart-header-row">
+      <span class="chart-label-title">目前外包代工月開銷</span>
+      <span class="chart-label-price" id="bar-out-price" style="color: #007AFF;">NT$ 0</span>
+    </div>
+    <div class="bar-container"><div class="bar bar-outsource" id="bar-out"></div></div>
+    
+    <div class="chart-header-row">
+      <span class="chart-label-title">引進宙斯自購總開銷 (分期+能耗)</span>
+      <span class="chart-label-price" id="bar-zeus-price" style="color: #FF5500;">NT$ 0</span>
+    </div>
+    <div class="bar-container"><div class="bar bar-zeus" id="bar-zeus"></div></div>
+    <p class="profit-text" id="res-profit">▶ 每月多留住現金流 NT$ 0</p>
+  </div>
+
+  <p class="marketing-footer" id="res-marketing">...</p>
+  
+  <div class="btn-group">
+    <button class="cta-btn btn-line" onclick="sendToLine()">💬 一鍵傳送精算報告至客戶 LINE</button>
+  </div>
+</div>
+
+<script>
+let globalReportText = ""; 
+
+function isNumberKey(evt) {
+  var charCode = (evt.which) ? evt.which : evt.keyCode;
+  if (charCode > 31 && (charCode < 48 || charCode > 57)) return false;
+  return true;
+}
+
+function formatFromKeypress(type) {
+  const numInput = document.getElementById(`input-${type}-num`);
+  const rangeInput = document.getElementById(`input-${type}-range`);
+  
+  let rawValue = numInput.value.replace(/,/g, '');
+  let numericValue = parseInt(rawValue) || 0;
+  
+  const maxLimit = type === 'cost' ? 1000000 : 15000000;
+  if (numericValue > maxLimit) numericValue = maxLimit;
+
+  numInput.value = numericValue.toLocaleString();
+  
+  if (numericValue >= rangeInput.min && numericValue <= rangeInput.max) {
+    rangeInput.value = numericValue;
+  }
+  
+  updateUI();
+}
+
+function formatFromRange(type) {
+  const numInput = document.getElementById(`input-${type}-num`);
+  const rangeInput = document.getElementById(`input-${type}-range`);
+  
+  let numericValue = parseInt(rangeInput.value) || 0;
+  numInput.value = numericValue.toLocaleString();
+  
+  updateUI();
+}
+
+function updateUI() {
+  const costRaw = document.getElementById('input-cost-num').value.replace(/,/g, '');
+  const cost = parseInt(costRaw) || 0;
+
+  const priceRaw = document.getElementById('input-price-num').value.replace(/,/g, '');
+  const price = parseInt(priceRaw) || 0;
+
+  const thick = parseInt(document.getElementById('input-thick').value) || 1;
+  const months = parseInt(document.getElementById('input-finance').value);
+  const interestRate = parseFloat(document.getElementById('input-rate').value);
+  const gas = document.getElementById('input-gas').value;
+
+  // 如果厚度欄位的展示不需要換行，單純同步文字即可
+  const thickTxtEl = document.getElementById('thick-txt');
+  if(thickTxtEl) thickTxtEl.innerText = thick + " mm";
+  
+  const rateTxtEl = document.getElementById('rate-txt');
+  if(rateTxtEl) rateTxtEl.innerText = interestRate.toFixed(1) + " %";
+
+  const marketHourlyRate = 1500; 
+  const estimatedHours = Math.round(cost / marketHourlyRate);
+
+  let power = 3000;
+  if (thick >= 3 || cost >= 120000) { power = 6000; }
+  document.getElementById('rec-power').innerText = `系統推薦：ZEUS-3015 / ${power}W 雷射切割機`;
+
+  let avgKw = 0;
+  let gasCostPerHour = 150; 
+  if (power === 6000) {
+    avgKw = 55 * 0.65; 
+    gasCostPerHour = 280; 
+  } else {
+    avgKw = (19 + 15) * 0.6; 
+    gasCostPerHour = 180;
+  }
+
+  if (gas === 'air') gasCostPerHour -= 100;
+  if (gas === 'n2') gasCostPerHour += 120;
+  if (gas === 'o2') gasCostPerHour += 10;
+
+  const elecRate = 4.8; 
+  const monthlyElecCost = Math.round(estimatedHours * avgKw * elecRate);
+  const monthlyGasCost = Math.round(estimatedHours * gasCostPerHour);
+  const totalSelfCost = monthlyElecCost + monthlyGasCost;
+
+  const annualRate = interestRate / 100;
+  const monthlyRate = annualRate / 12;
+  let monthlyLoanPayment = 0;
+  if (price > 0) {
+    monthlyLoanPayment = Math.round((price * monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1));
+  }
+
+  const logisticSavings = cost > 0 ? 8000 : 0;
+  const netSavings = (cost - totalSelfCost - monthlyLoanPayment) + logisticSavings;
+
+  let roiText = "";
+  const monthlyRecoveredCash = cost - totalSelfCost + logisticSavings; 
+
+  if (monthlyRecoveredCash > 0) {
+    const totalRoiMonths = price / monthlyRecoveredCash;
+    const roiYears = Math.floor(totalRoiMonths / 12);
+    const roiRemainingMonths = Math.round(totalRoiMonths % 12);
+    roiText = roiYears === 0 ? `${roiRemainingMonths} 個月` : `${roiYears} 年 ${roiRemainingMonths} 個月`;
+  } else {
+    roiText = "外包產量過低，建議調整接單策略";
+  }
+  document.getElementById('res-roi-time').innerText = roiText;
+
+  if (cost > 0) {
+    let pctEnergy = ((totalSelfCost) / cost) * 100;
+    let pctLoan = (monthlyLoanPayment / cost) * 100;
+
+    let energyDollar = Math.round(pctEnergy);
+    let loanDollar = Math.round(pctLoan);
+    let pocketDollar = 100 - energyDollar - loanDollar; 
+
+    if (netSavings < 0) { pocketDollar = Math.round(((netSavings) / cost) * 100); }
+
+    document.getElementById('split-energy').innerText = `$ ${energyDollar} 元`;
+    document.getElementById('split-loan').innerText = `$ ${loanDollar} 元`;
+    document.getElementById('split-pocket').innerText = pocketDollar >= 0 ? `$ ${pocketDollar} 元 (多賺進口袋)` : `$ ${pocketDollar} 元 (需補貼差額)`;
+  } else {
+    document.getElementById('split-energy').innerText = "$ 0 元";
+    document.getElementById('split-loan').innerText = "$ 0 元";
+    document.getElementById('split-pocket').innerText = "$ 0 元";
+  }
+
+  document.getElementById('res-hours').innerText = estimatedHours + " 小時";
+  document.getElementById('res-loan').innerText = "NT$ " + monthlyLoanPayment.toLocaleString();
+  document.getElementById('detail-outsource').innerText = "NT$ " + cost.toLocaleString();
+  document.getElementById('detail-elec').innerText = "- NT$ " + monthlyElecCost.toLocaleString() + " (" + Math.round(avgKw) + "度/時)";
+  document.getElementById('detail-gas').innerText = "- NT$ " + monthlyGasCost.toLocaleString();
+  document.getElementById('detail-loan-cost').innerText = "- NT$ " + monthlyLoanPayment.toLocaleString();
+  document.getElementById('detail-logistic').innerText = "+ NT$ " + logisticSavings.toLocaleString();
+
+  const circleTitleEl = document.getElementById('circle-title');
+  const savingsEl = document.getElementById('res-savings');
+  const profitTxtEl = document.getElementById('res-profit');
+  const barOutEl = document.getElementById('bar-out');
+  const barZeusEl = document.getElementById('bar-zeus');
+
+  if (netSavings >= 0) {
+    circleTitleEl.innerHTML = "扣除貸款後<br>每月淨賺利潤";
+    circleTitleEl.style.color = "#A3A3A3";
+    savingsEl.innerText = "NT$ " + netSavings.toLocaleString();
+    savingsEl.style.color = "#FF5500";
+    profitTxtEl.innerText = `▶ 每月幫公司多留住 NT$ ${netSavings.toLocaleString()} 現金流！`;
+    profitTxtEl.style.color = "#FF5500";
+  } else {
+    circleTitleEl.innerHTML = "差額尚不足以<br>完全軋平貸款";
+    circleTitleEl.style.color = "#ef4444";
+    savingsEl.innerText = "NT$ " + Math.abs(netSavings).toLocaleString();
+    savingsEl.style.color = "#ef4444"; 
+    profitTxtEl.innerText = `▶ 每月需額外補貼 NT$ ${Math.abs(netSavings).toLocaleString()}`;
+    profitTxtEl.style.color = "#ef4444";
+  }
+
+  const maxScaleLimit = 1000000; 
+  const totalZeusExpense = totalSelfCost + monthlyLoanPayment;
+
+  document.getElementById('bar-out-price').innerText = "NT$ " + cost.toLocaleString();
+  document.getElementById('bar-zeus-price').innerText = "NT$ " + totalZeusExpense.toLocaleString();
+
+  let outBarWidth = (cost / maxScaleLimit) * 100;
+  let zeusBarWidth = (totalZeusExpense / maxScaleLimit) * 100;
+
+  if (outBarWidth > 100) outBarWidth = 100;
+  if (cost > 0 && outBarWidth < 2) outBarWidth = 2;
+  if (zeusBarWidth > 100) zeusBarWidth = 100;
+  if (totalZeusExpense > 0 && zeusBarWidth < 2) zeusBarWidth = 2;
+
+  barOutEl.style.width = outBarWidth + "%";
+  barZeusEl.style.width = zeusBarWidth + "%";
+  
+  if (netSavings >= 0) {
+    barZeusEl.style.backgroundColor = "#FF5500";
+  } else {
+    barZeusEl.style.backgroundColor = "#ef4444";
+  }
+
+  let note = "";
+  if (netSavings >= 0) {
+    note = `老闆您好！以融資利率 ${interestRate.toFixed(1)}% 精算，此投資預計在 ${roiText} 之後即可全額回收。在繳分期期間，每個月還能幫公司多掏回利潤，極具投資價值！`;
+  } else {
+    note = `老闆您好！目前外包量相較於高階投資差額約 ${Math.abs(netSavings).toLocaleString()} 元，但只要自購後將掌控的主動權釋放、多接同行外包，即可迅速翻轉為高獲利！`;
+  }
+  document.getElementById('res-marketing').innerText = note;
+
+  let gasName = "空氣";
+  if (gas === 'n2') gasName = "氮氣";
+  if (gas === 'o2') gasName = "氧氣";
+
+  globalReportText = `【ZEUS 宙斯雷射投資效益與回本報告】\n` +
+                     `● 預估投資回收期：${roiText}\n` +
+                     `-----------------------\n` +
+                     `📊 每 100 元外包預算金流重分配：\n` +
+                     `● 傳統外包現狀：$100 元全部拱手送人\n` +
+                     `● 宙斯進場-生產能耗僅佔：$${Math.round(((totalSelfCost)/cost)*100)} 元\n` +
+                     `● 宙斯進場-機台分期僅佔：$${Math.round((monthlyLoanPayment/cost)*100)} 元\n` +
+                     `● 宙斯進場-多留口袋的錢：$${100 - Math.round(((totalSelfCost)/cost)*100) - Math.round((monthlyLoanPayment/cost)*100)} 元！\n` +
+                     `-----------------------\n` +
+                     `● 目前月代工費支出：NT$ ${cost.toLocaleString()}\n` +
+                     `● 推薦機型規格：ZEUS 3015 / ${power}W\n` +
+                     `● 切割輔助氣體：${gasName}\n` +
+                     `-----------------------\n` +
+                     `【自購後每月維護與財務拆解】\n` +
+                     `● 融資分期月付款：NT$ ${monthlyLoanPayment.toLocaleString()} (${months}期)\n` +
+                     `● 實際平均電費：NT$ ${monthlyElecCost.toLocaleString()} (約 ${Math.round(avgKw)}度/時)\n` +
+                     `● 氣體與常態損耗：NT$ ${monthlyGasCost.toLocaleString()}\n` +
+                     `● 物流及司機節省：+ NT$ 8,000\n` +
+                     `-----------------------\n` +
+                     `★ 財務評估結論：\n` +
+                     (netSavings >= 0 ? `扣除資融分期與運營能耗，每月公司多出 NT$ ${netSavings.toLocaleString()} 元的可支配淨現金流！代工費直接幫您養新機台！` : `目前每月資融差額約 NT$ ${Math.abs(netSavings).toLocaleString()} 元。建議引進設備掌控高精密交期，並可對外承接代工迅速填補差額。`);
+}
+
+function sendToLine() {
+  const lineUrl = "https://line.me/R/share?text=" + encodeURIComponent(globalReportText);
+  window.open(lineUrl, '_blank');
+}
+
+window.onload = function() { 
+  updateUI(); 
+  setTimeout(function() { updateUI(); }, 50);
+  setTimeout(function() { updateUI(); }, 200);
+};
+</script>
+</body>
+</html>
