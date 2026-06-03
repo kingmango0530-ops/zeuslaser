@@ -2,180 +2,116 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZEUS Laser - Configuration Tool</title>
+    <title>ZEUS 配置器</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
-
     <div class="zeus-container">
-        <div class="zeus-header">
-            <div>
-                <h1 class="brand-title">⚡ ZEUS 宙斯雷射</h1>
-                <p class="brand-subtitle">專業版 - 2D/3D 聯動機台配置器</p>
-            </div>
-            <button id="downloadBtn" class="zeus-btn">💾 下載 2D 工程圖</button>
-        </div>
+        <header class="zeus-header">
+            <h1>⚡ ZEUS 配置器</h1>
+            <button id="downloadBtn" class="zeus-btn">💾 導出圖片</button>
+        </header>
 
-        <div class="zeus-workspace">
-            <div class="sidebar">
+        <main class="zeus-workspace">
+            <aside class="sidebar">
                 <div class="panel-box">
-                    <h3 class="panel-h3">📝 專案基本設定</h3>
-                    <div class="input-stack">
-                        <label>機型名稱：</label>
-                        <input type="text" id="globalModelName" value="ZLF6015">
-                        <label>廠房總長 (L) mm：</label>
-                        <input type="number" id="factoryLength" value="12000">
-                        <label>廠房總寬 (W) mm：</label>
-                        <input type="number" id="factoryWidth" value="5000">
+                    <h3>📝 專案與廠房</h3>
+                    <input type="text" id="globalModelName" value="ZLF6015" placeholder="機型名稱">
+                    <div class="input-grid">
+                        <input type="number" id="factoryLength" value="12000" placeholder="廠房長">
+                        <input type="number" id="factoryWidth" value="5000" placeholder="廠房寬">
                     </div>
                 </div>
 
                 <div class="panel-box" id="editPanel">
-                    <h3 class="panel-h3">✏️ 編輯選定物件</h3>
-                    <p id="noSelectPrompt" style="font-size: 12px; color: #888;">※ 點擊畫布物件進行二次編輯</p>
-                    <div id="editFields" class="input-stack" style="display: none;">
-                        <label>物件名稱：</label> <input type="text" id="editName">
+                    <h3>✏️ 編輯選定物件</h3>
+                    <p id="noSelectPrompt" style="font-size:12px; color:#888;">點擊右側物件以編輯</p>
+                    <div id="editFields" style="display:none; display:flex; flex-direction:column; gap:5px;">
+                        <input type="text" id="editName">
                         <div class="input-grid">
-                            <div><label>長(L):</label> <input type="number" id="editLength"></div>
-                            <div><label>寬(W):</label> <input type="number" id="editWidth"></div>
+                            <input type="number" id="editLength">
+                            <input type="number" id="editWidth">
                         </div>
-                        <label>機體高度 (H):</label> <input type="number" id="editHeight">
-                        <label>機台顏色：</label> <input type="color" id="editColor" style="height:30px;">
+                        <input type="color" id="editColor">
                     </div>
                 </div>
+            </aside>
 
-                <div class="panel-box">
-                    <h3 class="panel-h3">➕ 新增設備</h3>
-                    <div class="input-stack">
-                        <input type="text" id="newName" value="輔助設備">
-                        <div class="input-grid">
-                            <input type="number" id="newLength" value="1000">
-                            <input type="number" id="newWidth" value="1000">
-                        </div>
-                        <button id="addObjBtn" class="zeus-btn-secondary">⚡ 新增物件</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="canvas-main-area">
-                <div id="captureArea" class="capture-zone">
-                    <div class="canvas-header">
-                        <h2><span id="headerModelName">ZLF6015</span> 配置模擬</h2>
-                        <p>空間: <span id="canvasSpec">12000 x 5000 mm</span></p>
-                    </div>
+            <section class="canvas-main">
+                <div id="captureArea" class="canvas-zone">
+                    <h2 id="headerModelName">ZLF6015</h2>
                     <div id="layoutCanvas" class="grid-canvas">
-                        <div id="scalableField" class="factory-field">
-                            <div class="box-device" data-id="main" style="top:50px; left:50px; background-color:#334155;">
-                                <button class="delete-icon-btn">×</button>
-                                <div class="device-inner-name">ZLF6015 主機</div>
-                                <div class="dim-line dim-h"><span class="dim-text">8181 mm</span></div>
-                                <div class="dim-line dim-v"><span class="dim-text">2409 mm</span></div>
-                            </div>
-                        </div>
+                        <div id="scalableField" class="factory-field"></div>
                     </div>
                 </div>
-                <div id="threeContainer" class="three-container-box"></div>
-            </div>
-        </div>
+            </section>
+        </main>
     </div>
     <script src="script.js"></script>
 </body>
 </html>
-body { margin: 0; padding: 20px; background: #0d1117; color: #fff; font-family: sans-serif; }
-.zeus-container { max-width: 1300px; margin: 0 auto; background: #161b22; border-radius: 10px; overflow: hidden; }
-.zeus-header { padding: 20px; background: #21262d; display: flex; justify-content: space-between; align-items: center; }
-.zeus-workspace { display: flex; gap: 20px; padding: 20px; }
+body { margin: 0; background: #0d1117; color: #fff; font-family: sans-serif; }
+.zeus-container { max-width: 1200px; margin: auto; }
+.zeus-header { height: 60px; background: #21262d; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+.zeus-workspace { display: flex; padding: 20px; gap: 20px; }
+
+/* 關鍵：強制左側面板不壓縮 */
 .sidebar { width: 300px; flex-shrink: 0; display: flex; flex-direction: column; gap: 15px; }
-.panel-box { background: #0d1117; padding: 15px; border: 1px solid #30363d; border-radius: 8px; }
-.panel-h3 { margin-top: 0; font-size: 14px; color: #ff7a00; }
-.input-stack { display: flex; flex-direction: column; gap: 8px; }
+.canvas-main { flex-grow: 1; }
+
+.panel-box { background: #161b22; padding: 15px; border-radius: 8px; border: 1px solid #30363d; }
 .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
-input { background: #161b22; border: 1px solid #30363d; color: white; padding: 5px; border-radius: 4px; }
-.zeus-btn { background: #ff7a00; border: none; padding: 10px 20px; color: white; border-radius: 5px; cursor: pointer; }
-.zeus-btn-secondary { background: #21262d; border: 1px solid #30363d; color: white; padding: 8px; cursor: pointer; }
+input { width: 100%; box-sizing: border-box; background: #0d1117; border: 1px solid #30363d; color: #fff; padding: 5px; margin-bottom: 5px; }
 
-/* 2D Canvas */
-.capture-zone { background: #fff; color: #000; padding: 20px; }
-.grid-canvas { border: 2px solid #000; height: 300px; position: relative; background-image: linear-gradient(#eee 1px, transparent 1px), linear-gradient(90deg, #eee 1px, transparent 1px); background-size: 20px 20px; }
-.factory-field { border: 2px dashed #ff7a00; position: absolute; }
-.box-device { position: absolute; cursor: move; border: 1px solid #000; display: flex; align-items: center; justify-content: center; }
-.device-inner-name { font-size: 10px; font-weight: bold; color: #fff; text-align: center; pointer-events: none; }
-.delete-icon-btn { position: absolute; top: -8px; right: -8px; background: red; color: white; border-radius: 50%; border: none; width: 16px; height: 16px; font-size: 10px; display: none; }
-.box-device:hover .delete-icon-btn { display: block; }
-.hide-delete-ui .delete-icon-btn { display: none !important; }
+.canvas-zone { background: #fff; color: #000; padding: 20px; }
+.grid-canvas { border: 2px solid #000; height: 400px; position: relative; background-image: linear-gradient(#eee 1px, transparent 1px), linear-gradient(90deg, #eee 1px, transparent 1px); background-size: 20px 20px; }
+.factory-field { position: absolute; border: 2px dashed #ff7a00; }
 
-/* 尺寸線 */
-.dim-line { position: absolute; }
-.dim-h { bottom: -15px; left: 0; width: 100%; border-left: 1px solid black; border-right: 1px solid black; border-bottom: 1px solid black; }
-.dim-v { right: -15px; top: 0; height: 100%; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; }
-.dim-text { font-size: 9px; background: white; padding: 0 2px; }
-
+.box-device { position: absolute; border: 1px solid #000; cursor: move; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: white; text-shadow: 1px 1px 1px #000; }
+.zeus-btn { background: #ff7a00; border: none; padding: 10px; color: white; cursor: pointer; }
 const deviceData = {
-    'main': { name: 'ZLF6015 主機', w: 8181, h: 2409, depth: 1600, color: '#334155' }
+    'main': { name: 'ZLF6015 主機', w: 8181, h: 2409, color: '#334155', x: 50, y: 50 }
 };
 
-let globalScale = 1;
-let selectedElement = null;
+let selectedId = null;
 
-function updateLayout() {
-    const fL = parseFloat(document.getElementById('factoryLength').value) || 12000;
-    const fW = parseFloat(document.getElementById('factoryWidth').value) || 5000;
-    const canvas = document.getElementById('layoutCanvas');
+function render() {
     const field = document.getElementById('scalableField');
+    field.innerHTML = '';
     
-    globalScale = Math.min((canvas.clientWidth - 60) / fL, (canvas.clientHeight - 60) / fW);
-    field.style.width = (fL * globalScale) + 'px';
-    field.style.height = (fW * globalScale) + 'px';
-
-    document.querySelectorAll('.box-device').forEach(el => {
-        const id = el.dataset.id;
-        if (deviceData[id]) {
-            el.style.width = (deviceData[id].w * globalScale) + 'px';
-            el.style.height = (deviceData[id].h * globalScale) + 'px';
-            el.style.backgroundColor = deviceData[id].color;
-            el.querySelector('.device-inner-name').innerText = deviceData[id].name;
-            el.querySelector('.dim-h .dim-text').innerText = deviceData[id].w + 'mm';
-            el.querySelector('.dim-v .dim-text').innerText = deviceData[id].h + 'mm';
-        }
-    });
-}
-
-function initDevice(el) {
-    el.onmousedown = (e) => {
-        selectedElement = el;
-        document.getElementById('editFields').style.display = 'block';
-        document.getElementById('noSelectPrompt').style.display = 'none';
+    for (let id in deviceData) {
+        const d = deviceData[id];
+        const el = document.createElement('div');
+        el.className = 'box-device';
+        el.style.left = d.x + 'px';
+        el.style.top = d.y + 'px';
+        el.style.width = (d.w * 0.05) + 'px'; // 簡化比例，建議之後改用動態 scale
+        el.style.height = (d.h * 0.05) + 'px';
+        el.style.backgroundColor = d.color;
+        el.innerText = d.name;
         
-        const id = el.dataset.id;
-        document.getElementById('editName').value = deviceData[id].name;
-        document.getElementById('editLength').value = deviceData[id].w;
-        document.getElementById('editWidth').value = deviceData[id].h;
-        document.getElementById('editHeight').value = deviceData[id].depth;
-        document.getElementById('editColor').value = deviceData[id].color;
-    };
-    el.querySelector('.delete-icon-btn').onclick = (e) => { e.stopPropagation(); delete deviceData[el.dataset.id]; el.remove(); };
+        el.onclick = () => {
+            selectedId = id;
+            document.getElementById('editFields').style.display = 'flex';
+            document.getElementById('noSelectPrompt').style.display = 'none';
+            document.getElementById('editName').value = d.name;
+            document.getElementById('editLength').value = d.w;
+            document.getElementById('editWidth').value = d.h;
+            document.getElementById('editColor').value = d.color;
+        };
+        field.appendChild(el);
+    }
 }
 
-// 綁定輸入即時更新 (解鎖 Bug 的關鍵)
-['editName', 'editLength', 'editWidth', 'editHeight', 'editColor'].forEach(id => {
-    document.getElementById(id).oninput = (e) => {
-        if (!selectedElement) return;
-        const d = deviceData[selectedElement.dataset.id];
-        if (id === 'editName') d.name = e.target.value;
-        if (id === 'editLength') d.w = parseFloat(e.target.value);
-        if (id === 'editWidth') d.h = parseFloat(e.target.value);
-        if (id === 'editHeight') d.depth = parseFloat(e.target.value);
-        if (id === 'editColor') d.color = e.target.value;
-        updateLayout();
-    };
-});
+// 綁定編輯
+document.getElementById('editName').oninput = (e) => { deviceData[selectedId].name = e.target.value; render(); };
+document.getElementById('editLength').oninput = (e) => { deviceData[selectedId].w = e.target.value; render(); };
+document.getElementById('editWidth').oninput = (e) => { deviceData[selectedId].h = e.target.value; render(); };
+document.getElementById('globalModelName').oninput = (e) => {
+    document.getElementById('headerModelName').innerText = e.target.value;
+    deviceData['main'].name = e.target.value + ' 主機';
+    render();
+};
 
-document.getElementById('globalModelName').oninput = (e) => document.getElementById('headerModelName').innerText = e.target.value;
-document.getElementById('addObjBtn').onclick = () => { /* 新增邏輯 */ };
-document.querySelectorAll('.box-device').forEach(initDevice);
-updateLayout();
-/* 3D Container */
-.three-container-box { width: 100%; height: 400px; background: #000; margin-top: 20px; border-radius: 8px; }
+render();
