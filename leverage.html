@@ -4,110 +4,112 @@
     <meta charset="UTF-8">
     <title>ZEUS Laser Configuration</title>
     <style>
-        /* 強制排版：確保左右兩欄永遠並排，不會互相擠壓 */
-        body { margin: 0; background: #0d1117; color: #fff; font-family: sans-serif; height: 100vh; display: flex; flex-direction: column; }
-        .container { display: flex; flex: 1; overflow: hidden; }
+        /* 嚴謹版 CSS：強制左側固定，右側自適應，絕不破圖 */
+        body { margin: 0; background: #1a1a1a; color: #fff; font-family: sans-serif; height: 100vh; display: flex; flex-direction: column; }
+        .workspace { display: flex; flex: 1; overflow: hidden; }
+        .sidebar { width: 300px; flex-shrink: 0; background: #252525; padding: 20px; overflow-y: auto; border-right: 1px solid #444; }
+        .canvas-area { flex-grow: 1; padding: 20px; background: #fff; display: flex; flex-direction: column; }
         
-        /* 左側固定寬度面板 */
-        .sidebar { width: 320px; flex-shrink: 0; background: #161b22; padding: 20px; border-right: 1px solid #30363d; overflow-y: auto; }
+        .panel { background: #333; padding: 15px; margin-bottom: 15px; border-radius: 8px; }
+        input { width: 100%; box-sizing: border-box; padding: 8px; margin: 5px 0; background: #000; color: #fff; border: 1px solid #555; }
         
-        /* 右側畫布區域 */
-        .main-canvas { flex-grow: 1; display: flex; flex-direction: column; padding: 20px; overflow: hidden; }
-        .canvas-zone { background: #fff; color: #000; padding: 20px; border-radius: 8px; flex: 1; display: flex; flex-direction: column; }
+        .grid-canvas { border: 2px solid #000; flex: 1; position: relative; background-image: linear-gradient(#eee 1px, transparent 1px), linear-gradient(90deg, #eee 1px, transparent 1px); background-size: 20px 20px; }
+        .factory-field { position: absolute; border: 2px dashed #ff7a00; }
         
-        /* 控制元件與輸入框 */
-        .input-group { margin-bottom: 15px; }
-        label { display: block; font-size: 12px; margin-bottom: 4px; color: #aaa; }
-        input { width: 100%; padding: 8px; border: 1px solid #30363d; border-radius: 4px; background: #0d1117; color: #fff; box-sizing: border-box; }
-        
-        /* 畫布與物件 */
-        .grid { border: 2px solid #000; flex: 1; position: relative; background-image: linear-gradient(#eee 1px, transparent 1px), linear-gradient(90deg, #eee 1px, transparent 1px); background-size: 20px 20px; }
-        .box { position: absolute; border: 1px solid #000; cursor: move; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #fff; text-shadow: 1px 1px 1px #000; }
-        .delete-x { position: absolute; top: -10px; right: -10px; background: red; color: white; border: none; border-radius: 50%; width: 18px; cursor: pointer; }
-        .three-box { height: 300px; background: #000; margin-top: 10px; }
+        .box-device { position: absolute; cursor: move; border: 1px solid #000; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10px; font-weight: bold; }
+        .delete-btn { position: absolute; top: -10px; right: -10px; background: red; color: white; border-radius: 50%; border: none; width: 18px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <aside class="sidebar">
+    <header style="height:50px; background:#000; display:flex; align-items:center; padding:0 20px;">
         <h2>⚡ ZEUS 宙斯配置器</h2>
-        <div class="input-group">
-            <label>機型名稱 (大標題)：</label>
-            <input type="text" id="modelName" value="ZLF6015">
-        </div>
-        <hr>
-        <h3>✏️ 編輯選定物件</h3>
-        <div id="editFields" style="display:none; display:flex; flex-direction:column; gap:5px;">
-            <label>名稱:</label><input type="text" id="editName">
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px;">
-                <input type="number" id="editL" placeholder="長">
-                <input type="number" id="editW" placeholder="寬">
+    </header>
+
+    <div class="workspace">
+        <aside class="sidebar">
+            <div class="panel">
+                <label>機型名稱：</label>
+                <input type="text" id="modelName" value="ZLF6015">
             </div>
-            <label>顏色:</label><input type="color" id="editColor">
-        </div>
-        <hr>
-        <button id="addBtn" style="padding:10px; width:100%; cursor:pointer;">⚡ 新增物件</button>
-    </aside>
+            <div class="panel" id="editPanel">
+                <h3>✏️ 編輯物件</h3>
+                <label>名稱:</label><input type="text" id="editName">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px;">
+                    <input type="number" id="editL" placeholder="長">
+                    <input type="number" id="editW" placeholder="寬">
+                </div>
+                <input type="color" id="editColor">
+            </div>
+            <div class="panel">
+                <h3>➕ 新增障礙物</h3>
+                <input type="text" id="newName" value="輔助設備">
+                <button id="addBtn" style="width:100%; padding:10px; cursor:pointer;">⚡ 新增</button>
+            </div>
+        </aside>
 
-    <main class="main-canvas">
-        <h2 id="displayTitle">ZLF6015 佈局圖</h2>
-        <div id="grid" class="grid"></div>
-        <div id="threeContainer" class="three-box"></div>
-    </main>
-</div>
+        <section class="canvas-area">
+            <h2 id="displayTitle">ZLF6015 佈局圖</h2>
+            <div id="layoutCanvas" class="grid-canvas">
+                <div id="scalableField" class="factory-field"></div>
+            </div>
+        </section>
+    </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script>
-    // 核心數據庫
-    let devices = { 'main': { name: 'ZLF6015 主機', l: 8181, w: 2409, color: '#334155', x: 50, y: 50 } };
-    let selectedId = null;
+    <script>
+        window.onload = function() {
+            let data = { 'main': { name: 'ZLF6015 主機', l: 8181, w: 2409, color: '#334155', x: 50, y: 50 } };
+            let selectedId = null;
 
-    function render() {
-        const grid = document.getElementById('grid');
-        grid.innerHTML = '';
-        for (let id in devices) {
-            const d = devices[id];
-            const el = document.createElement('div');
-            el.className = 'box';
-            el.style.left = d.x + 'px'; el.style.top = d.y + 'px';
-            el.style.width = (d.l * 0.04) + 'px'; // 調整縮放比例
-            el.style.height = (d.w * 0.04) + 'px';
-            el.style.backgroundColor = d.color;
-            el.innerHTML = `<button class="delete-x">×</button>${d.name}`;
+            function render() {
+                const field = document.getElementById('scalableField');
+                field.innerHTML = '';
+                for (let id in data) {
+                    const d = data[id];
+                    const el = document.createElement('div');
+                    el.className = 'box-device';
+                    el.style.left = d.x + 'px'; el.style.top = d.y + 'px';
+                    el.style.width = (d.l * 0.04) + 'px';
+                    el.style.height = (d.w * 0.04) + 'px';
+                    el.style.backgroundColor = d.color;
+                    el.innerHTML = `<button class="delete-btn">×</button>${d.name}`;
+                    
+                    el.onclick = (e) => { 
+                        e.stopPropagation(); 
+                        selectedId = id;
+                        document.getElementById('editFields').style.display = 'flex';
+                        document.getElementById('editName').value = d.name;
+                        document.getElementById('editL').value = d.l;
+                        document.getElementById('editW').value = d.w;
+                        document.getElementById('editColor').value = d.color;
+                    };
+                    
+                    el.querySelector('.delete-btn').onclick = (e) => { e.stopPropagation(); delete data[id]; render(); };
+                    field.appendChild(el);
+                }
+            }
+
+            // 綁定編輯連動
+            document.getElementById('editName').oninput = (e) => { if(selectedId) { data[selectedId].name = e.target.value; render(); } };
+            document.getElementById('editL').oninput = (e) => { if(selectedId) { data[selectedId].l = e.target.value; render(); } };
+            document.getElementById('editW').oninput = (e) => { if(selectedId) { data[selectedId].w = e.target.value; render(); } };
+            document.getElementById('editColor').oninput = (e) => { if(selectedId) { data[selectedId].color = e.target.value; render(); } };
             
-            el.onclick = () => {
-                selectedId = id;
-                document.getElementById('editFields').style.display = 'flex';
-                document.getElementById('editName').value = d.name;
-                document.getElementById('editL').value = d.l;
-                document.getElementById('editW').value = d.w;
-                document.getElementById('editColor').value = d.color;
+            document.getElementById('modelName').oninput = (e) => { 
+                document.getElementById('displayTitle').innerText = e.target.value + ' 佈局圖'; 
+                data['main'].name = e.target.value + ' 主機';
+                render();
             };
-            el.querySelector('.delete-x').onclick = (e) => { e.stopPropagation(); delete devices[id]; render(); };
-            grid.appendChild(el);
-        }
-    }
 
-    // 綁定編輯連動
-    document.getElementById('editName').oninput = (e) => { devices[selectedId].name = e.target.value; render(); };
-    document.getElementById('editL').oninput = (e) => { devices[selectedId].l = e.target.value; render(); };
-    document.getElementById('editW').oninput = (e) => { devices[selectedId].w = e.target.value; render(); };
-    document.getElementById('editColor').oninput = (e) => { devices[selectedId].color = e.target.value; render(); };
-    
-    document.getElementById('modelName').oninput = (e) => {
-        document.getElementById('displayTitle').innerText = e.target.value + ' 佈局圖';
-        devices['main'].name = e.target.value + ' 主機';
-        render();
-    };
+            document.getElementById('addBtn').onclick = () => {
+                const id = 'obj_' + Date.now();
+                data[id] = { name: document.getElementById('newName').value, l: 1000, w: 1000, color: '#4b5563', x: 100, y: 100 };
+                render();
+            };
 
-    document.getElementById('addBtn').onclick = () => {
-        const id = 'obj_' + Date.now();
-        devices[id] = { name: '新物件', l: 1000, w: 1000, color: '#4b5563', x: 100, y: 100 };
-        render();
-    };
-
-    render();
-</script>
+            render();
+            console.log("System Initialized Successfully");
+        };
+    </script>
 </body>
 </html>
